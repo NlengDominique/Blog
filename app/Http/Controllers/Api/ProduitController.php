@@ -49,6 +49,8 @@ class ProduitController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $produit = Produit::find($id);
+        $produit->delete();
+        return response()->json(null,204);
     }
 }
