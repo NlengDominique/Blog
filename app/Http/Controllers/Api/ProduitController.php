@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Categorie;
 use App\Models\Produit;
-//use Illuminate\Suppor\Facades\Validator;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
 class ProduitController extends Controller
@@ -15,7 +15,7 @@ class ProduitController extends Controller
      */
     public function index()
     {
-       $produits = Produit::with('categorie')->paginate(5);
+       $produits = Produit::with('categorie')->get();
        return response()->json($produits,200);
     }
 
@@ -24,8 +24,27 @@ class ProduitController extends Controller
      */
     public function store(Request $request)
     {
+        $validated = Validator::make($request->all(), [
+            'nom' => 'required|string|max:255',
+            'prix' => 'required|numeric|min:0',
+            'description' => 'nullable',
+            'categorie_id' => 'required|exists:categories,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
 
-    }
+        if ($validated->fails()) {
+            return response()->json($validated->errors(), 422);
+        }
+
+        $data = $validated->validated();
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('produits', 'public');
+            $data['image'] = $imagePath;
+        }
+
+        $produit = Produit::create($data);
+        return response()->json($produit, 201);}
 
     /**
      * Display the specified resource.
@@ -41,7 +60,25 @@ class ProduitController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = Validator::make($request->all(), [
+            'nom' => 'required|string|max:255',
+            'prix' => 'required|numeric|min:0',
+            'description' => 'nullable',
+            'categorie_id' => 'required|exists:categories,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+       if ($validated->fails()) {
+            return response()->json($validated->errors(),422);
+        }
+  
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('produits', 'public');
+            $validated['image'] = $imagePath;
+        }
+       $produit = Produit::find($id);
+       $produit->update($validated);
+        return response()->json($produit,200);
     }
 
     /**

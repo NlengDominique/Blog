@@ -20,3 +20,4 @@ Route::get('/categories', [\App\Http\Controllers\Api\CategorieController::class,
 Route::get('/produits', [\App\Http\Controllers\Api\ProduitController::class, 'index']);
 
 Route::get('/produits/{id}', [\App\Http\Controllers\Api\ProduitController::class, 'show']);
+Route::post('/produits', [\App\Http\Controllers\Api\ProduitController::class, 'store']);

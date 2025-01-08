@@ -73,7 +73,7 @@ class ProduitController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $produit = Produit::with('categorie')->findOrFail($id);
+        $produit = Produit::findOrFail($id);
         $validated = $request->validate([
             'nom' => 'required|string|max:255',
             'prix' => 'required|numeric|min:0',
@@ -92,7 +92,7 @@ class ProduitController extends Controller
           }
       }
         $produit->update($validated);
-        return redirect()->back();
+        return redirect()->route('index');
     }
 
     /**
